@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUTS의 스토리 — 우리들의 이야기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F7F4EE;
+  --charcoal: #181818;
+  --yellow: #E8D42A;
+  --yellow-dark: #C4B220;
+  --gray-soft: #E8E4DA;
+  --gray-mid: #9E9A8E;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--cream); color: var(--charcoal); font-family: 'Noto Sans KR', sans-serif; overflow-x: hidden; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--charcoal); border-radius: 3px; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 48px;
+  background: rgba(247,244,238,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gray-soft);
+}
+.nav-back {
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.15em; color: var(--charcoal); text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: gap 0.2s;
+}
+.nav-back:hover { gap: 14px; }
+.nav-logo { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 0.15em; }
+.nav-cta {
+  background: var(--yellow); color: var(--charcoal);
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em; padding: 10px 22px; border: none; cursor: pointer;
+  text-decoration: none; border-radius: 8px; transition: transform 0.15s;
+}
+.nav-cta:hover { transform: translateY(-1px); }
+
+/* VIEWS */
+#list-view, #detail-view { min-height: 100vh; }
+#detail-view { display: none; }
+
+/* HERO */
+.stories-hero {
+  background: var(--charcoal); color: var(--cream);
+  padding: 140px 48px 80px; text-align: center;
+}
+.stories-hero .label {
+  font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.3em;
+  color: var(--yellow); margin-bottom: 20px;
+}
+.stories-hero h1 {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(36px, 6vw, 80px); line-height: 1.1;
+  margin-bottom: 20px;
+}
+.stories-hero p {
+  font-family: 'DM Serif Display', serif; font-style: italic;
+  font-size: clamp(16px, 2vw, 22px); color: rgba(247,244,238,0.65);
+}
+
+/* GRID */
+.stories-grid {
+  padding: 80px 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.story-card {
+  background: white; border: 1px solid var(--gray-soft);
+  border-radius: 16px; padding: 36px 32px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+.story-card::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 3px;
+  background: var(--yellow); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.3s;
+}
+.story-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); border-color: var(--charcoal); }
+.story-card:hover::after { transform: scaleX(1); }
+
+.card-tier {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.2em;
+  color: var(--yellow-dark); background: rgba(232,212,42,0.1);
+  border: 1px solid rgba(232,212,42,0.3); border-radius: 4px;
+  padding: 4px 10px; display: inline-block; margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Black Han Sans', sans-serif; font-size: 18px;
+  line-height: 1.35; margin-bottom: 12px; color: var(--charcoal);
+}
+.card-excerpt {
+  font-size: 13px; color: var(--gray-mid); line-height: 1.75;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-arrow {
+  position: absolute; bottom: 28px; right: 28px;
+  font-family: 'Space Mono', monospace; font-size: 18px; color: var(--yellow-dark);
+  transition: transform 0.2s;
+}
+.story-card:hover .card-arrow { transform: translateX(4px); }
+
+/* SECTION CHIPS */
+.card-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.chip {
+  font-size: 11px; color: var(--gray-mid); background: var(--cream);
+  border: 1px solid var(--gray-soft); border-radius: 99px; padding: 3px 10px;
+}
+
+/* DETAIL VIEW */
+.detail-nav {
+  position: sticky; top: 72px; z-index: 50;
+  background: rgba(247,244,238,0.95); backdrop-filter: blur(8px);
+  padding: 16px 48px; border-bottom: 1px solid var(--gray-soft);
+  display: flex; align-items: center; gap: 16px;
+}
+.detail-back {
+  font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+  color: var(--charcoal); background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; letter-spacing: 0.1em;
+  transition: gap 0.2s;
+}
+.detail-back:hover { gap: 14px; }
+.detail-breadcrumb {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  color: var(--gray-mid); letter-spacing: 0.1em;
+}
+
+.detail-content { max-width: 760px; margin: 0 auto; padding: 64px 48px 120px; }
+.detail-tier {
+  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.25em;
+  color: var(--yellow-dark); background: rgba(232,212,42,0.1);
+  border: 1px solid rgba(232,212,42,0.3); border-radius: 6px;
+  padding: 6px 14px; display: inline-block; margin-bottom: 24px;
+}
+.detail-title {
+  font-family: 'Black Han Sans', sans-serif;
+  font-size: clamp(26px, 4vw, 48px); line-height: 1.2;
+  margin-bottom: 48px; color: var(--charcoal);
+}
+
+.story-section { margin-bottom: 48px; }
+.story-section-label {
+  font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.2em;
+  color: var(--yellow-dark); margin-bottom: 12px; display: block;
+}
+.story-section h3 {
+  font-family: 'Black Han Sans', sans-serif; font-size: 20px;
+  margin-bottom: 14px; color: var(--charcoal);
+}
+.story-section p {
+  font-size: 15px; line-height: 1.9; color: #3a3a3a;
+  white-space: pre-wrap;
+}
+.story-divider { height: 1px; background: var(--gray-soft); margin: 40px 0; }
+
+/* PAGINATION */
+.story-nav-buttons {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--gray-soft);
+}
+.story-nav-btn {
+  font-family: 'Black Han Sans', sans-serif; font-size: 15px;
+  background: var(--charcoal); color: var(--yellow);
+  border: none; padding: 16px 28px; border-radius: 10px;
+  cursor: pointer; transition: transform 0.2s;
+}
+.story-nav-btn:hover { transform: translateY(-2px); }
+.story-nav-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+/* REVEAL */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+@media (max-width: 768px) {
+  nav { padding: 16px 24px; }
+  .stories-hero { padding: 110px 24px 60px; }
+  .stories-grid { padding: 48px 24px; grid-template-columns: 1fr; }
+  .detail-content { padding: 48px 24px 80px; }
+  .detail-nav { padding: 14px 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="guts-recruit.html" class="nav-back">← 지원안내로 돌아가기</a>
+  <span class="nav-logo">GUTS</span>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSePn_kv9s9aR_SrWpHwQu5-nIMDncOn2ij5_lejESzlCGkABg/viewform?usp=publish-editor" target="_blank" class="nav-cta">지원하기 →</a>
+</nav>
+
+<!-- LIST VIEW -->
+<div id="list-view">
+  <div class="stories-hero">
+    <div class="label">GUTS MEMBER STORIES</div>
+    <h1>우리들의 이야기</h1>
+    <p>나에게 GUTS란? 꽈당 모먼트, 그리고 My Ambition</p>
+  </div>
+
+  <div class="stories-grid" id="story-grid">
+    <!-- cards injected by JS -->
+  </div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div id="detail-view">
+  <div class="detail-nav">
+    <button class="detail-back" onclick="showList()">← 목록으로</button>
+    <span class="detail-breadcrumb">GUTS의 스토리 / <span id="detail-breadcrumb-title"></span></span>
+  </div>
+  <div class="detail-content" id="detail-content"></div>
+</div>
+
+<script>
+const STORIES = [
+  {
+    id: 'what-teacher',
+    tier: 'THE GUTS 🧚🏻‍♀️',
+    title: '나는 어떤 교사가 되고 싶은가?',
+    excerpt: '안녕하세요. 부산교대 과학교육과 3학년 박소혜입니다. 1학년 시절 교육심리 수업을 듣고 "이게 내가 대학에서 공부하고 싶었던 내용이다!"라는 생각이 들었고, 그렇게 GUTS에 합류하게 되었습니다.',
+    sections: [
+      { icon: '🕺', label: '나는 누구?', text: '안녕하세요. 현재 부산교대 과학교육과 3학년으로 재학중인 박소혜라고 합니다. 1학년 시절, 김진구 교수님의 교육심리 수업을 듣고 "이게 내가 대학에서 공부하고 싶었던 내용이다!"라는 생각이 들었고, 그렇게 GUTS라는 전문적학습공동체에 합류하게 되었습니다. 어느덧 3년차네요.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: 'GUTS는 모든 구성원들이 함께 활동을 꾸려가고 지식을 나누며 성장할 수 있는 곳입니다. 관심있는 분야와 관련한 활동들을 직접 자신의 손으로 일구고 무언가를 얻어갈 수 있다면 얼마나 좋을까요? 분명 얻기 힘든 경험일텐데 여기서는 그게 가능합니다.' },
+      { icon: '❤️‍🩹', label: '꽈당 모먼트', text: 'GUTS에서 제가 가장 처음으로 한 것은 논문 읽기였습니다. 당시 막 고등학교를 졸업한 병아리였던 저는 수능 지문을 읽듯 논문을 읽었어요. 그렇게 힘겨운 삽질을 하다가 교수님과 선배님들의 말씀을 듣고 깨달았어요. 논문은 그렇게 읽는 게 아니라는 것을요. 논문이라는 건 교수님께서도 수십 번씩 읽으시며 매번 새로운 깨달음을 얻어갈 수 있는 아주 광활한 지식의 바다였던 거예요.' },
+      { icon: '😤', label: '아이씨 나갈까', text: 'GUTS에서 제가 원하는 공부를 하기 위해서는 과외나 약속을 줄이고 시간을 내야한다는 걸 깨닫는 과도기가 있었습니다. 그땐 제 삶의 우선순위를 정하지 못해서 혼란스러운 감정을 느꼈어요. 지금이야 적정선을 찾아서 일과 공부 사이의 조화를 이루었지만요.' },
+      { icon: '🌱', label: 'My Ambition', text: '단순히 감으로 때려 맞추는 식의 교사가 아니라, 진짜 잘 알고 잘 다스리는 교사가 되고 싶던 저에게 또래관계는 엄청난 키워드였어요.\n\n공부를 하면 할수록 '이런 정보는 모든 교사분들이 아셔야 할 것 같은데?' 라는 생각이 드는 순간들이 너무나도 많습니다. 그래서 저는 제가 GUTS에서 공부하고 깨달은 내용들을 꼭 교사가 되고자 하는 사람들에게 전해주고 싶어요. 교사를 가르치는 교사가 되고 싶습니다.' }
+    ]
+  },
+  {
+    id: 'papa-smurf',
+    tier: 'THE GUTS · PAPA SMURF',
+    title: '교사가 혹은 교사나 되어볼까 하는 아이들의 신발을 신어보기 😂',
+    excerpt: '저는 GUTS의 PAPA SMURF, 진구쌤입니다. 부산에 오기 전에는 네덜란드와 핀란드에서 Research Fellow로, 유로로 월급 받으며 생활하던 지식 외노자였어요. 인생은 정말 랜덤박스인 것 같습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '저는 GUTS의 PAPA SMURF, 진구쌤입니다. 관우가 GUTS를 시작해놓고 임용 본다고 저에게 위로 짬 때리고 도망가는 바람에, 예상치 못하게 다중 역할(관리자, 멘토 그리고 대나무숲까지 ㅠ.ㅠ)을 떠안게 되었구요.\n\n개인적인 이야기를 드리면, 저는 부산을 평생 관광지로만 생각하며 살다가, 특별한 인연으로 부산에 정착해 예비 및 현직 교사들에게 심리학을(이라고 말하지만 결국 또래관계와 정체성 이야기만 하는…) 가르치고 또 연구하는 노진구쌤입니다. 부산에 오기 전에는 네덜란드와 핀란드에서 Research Fellow로, 유로로 월급 받으며 생활하던 지식 외노자였어요.\n\n저도 여러분이 꿈꾸는 학급에서 아이들과 울고 웃던 교사 중 한 명이었습니다. 졸업하고 딱 3년만 하고 대학원에 가야지 했는데, 처음 맡은 애들이 넘 이뻤습니다. Life Happens — 인생은 정말 랜덤박스인 것 같아요.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '부산에서의 삶 (GUTS is Busan to me 😊), 랜덤박스, 손 많이 가는 녀석들, 기대되는 무언가, 우리 반, 반전매력, 만나면 제일 반가운 그리고 보석같은 존재들입니다.' },
+      { icon: '🤬', label: '아이씨 나갈까 & 꽈당 모먼트', text: '"할 수 있는 일을 시작한 걸까" 하는 의구심에 가까웠습니다. 전문성에 대한 예비교사들의 희한한 생각, 그리고 대학에서 학생-멘토 간의 관계가 가장 큰 어려움이었어요.\n\n이런 시행착오 덕분에 GUTS 아이들, 애칭으로 미니언즈라고 부르는, 20대를 살아가는 아이들에 대해서 깊이 이해하게 되었어요.' },
+      { icon: '🌱', label: 'My Ambition', text: '가장 큰 소망은, 사랑스러운 GUTS 멤버들의 영원한 PAPA SMURF가 되어주고 싶다는 거예요. 멤버들이 앞으로 가꾸어나갈 교실에 놀러 가고, 아이들이 누구냐고 물어보면 "응, 선생님의 선생님이야"라는 말을 듣고 싶구요.\n\n또래관계 분야의 연구와 현장이 좀 더 연결되었으면 하는 마음도 있어요. GUTS 친구들의 관심이 자기 반에만 머무르지 않고, 연구자와 함께 협력해서 초등교육 전체의 발전에도 기여했으면 좋겠습니다.' }
+    ]
+  },
+  {
+    id: 'diamond',
+    tier: 'GUTS CLUB',
+    title: '포기할수 없는 다이아몬드',
+    excerpt: '나에게 GUTS는 거대한 다이아몬드 원석같다. 잘 다듬으면 진짜 훌륭한 보석이 될 수 있을 거 같은데…내가 들고 있는 건 나무 곡갱이라서 어디부터 다듬어야 할지 모르겠고.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: 'GUTS에 대해 알게 된 건 작년이었다. 그때도 김진구 교수님이 open workshop을 여셨고, 필수 참석이라 보러 갔다. '대학에 오니 참 신기한 게 많구나'라고 생각했다.\n\n내가 확신했던 건 제대로 된 교사가 되기 위해서는 저 단체에 들어가지 않으면 안 된다는 것이었다. 그래서 신청을 했다. 하지만 면접을 보고 떨어졌다. 그런데 교수님께서 experience라는 GUTS 체험판을 여셨고, 왠지 나를 향해 들어오라고 손짓 하시는 거 같아서 들어갔다. 그리고 지금 2기 동기들을 만났다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '나에게 GUTS는 거대한 다이아몬드 원석같다. 잘 다듬으면 진짜 훌륭한 보석이 될 수 있을 거 같은데…내가 들고 있는 건 나무 곡갱이라서…어디부터 다듬어야 할지 모르겠고. 저 돌덩이가 다이아몬드인지 그냥 돌덩이인지 긴가민가 했다면 광질 하는 걸 그만뒀을텐데…다이아몬드라는 걸 알긴 알고…그래서 그만둘 수 없다.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '꽈당하지 않은 게 내 꽈당 모먼트라고 생각한다. 뭔가 했는데 안 한 거 같다. 그래서 이제는 좀 많이 시도해보고 많이 넘어져보려 한다.' },
+      { icon: '🌱', label: 'My Ambition', text: '야망! 야망…뭐가 있지..\n\n바라는 게 한 가지 있다면 내가 내 직업을 좋아하면 좋겠다. 그냥 돈 벌려고 일하는 거 말고, 내가 진짜 좋아서 하는 일.\n\nGUTS에서 내가 주체적으로 무언가를 하다 보면 그래도 무언가 하나 얻어걸리지 않을까 싶다. 교육이라는 지붕 아래 저마다의 방식으로 자신의 꿈을 실현해 나가는 멤버들을 보고 있으면 나도 어느 순간 방향을 잡을 수 있지 않을까라는 막연한 생각이 들곤 한다.' }
+    ]
+  },
+  {
+    id: 'care-one-class',
+    tier: 'THE GUTS 🐈',
+    title: '"그냥 우리 반만 잘 케어하면 안 돼요?" + 교수님 메일 씹은 썰 푼다.',
+    excerpt: '과학교육학과 24학번 채연입니다. 교수님이 슬라이드를 딱 3초 보여주시며 "같이 공부하는 애들이 있는데, 관심 있는 사람은 찾아오세요"라고 하셨어요. 그렇게 GUTS에 들어오게 됐습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '안녕하세요. 저는 과학교육학과 24학번 채연입니다.\nGUTS와의 인연은 교육심리 수업에서 시작됐어요. 여러 수업 중에서도 유독 "이건 진짜 수업다운 수업이다" 싶었어요. 교육심리 책을 읽다 보면 고등학생 때의 제 모습이 하나씩 이해되기 시작했어요. 일종의 me-search랄까요.\n\n동시에 이런 생각도 했어요. '내가 좋은 교사가 되어서 우리 반만 잘 케어하면 되지 않을까?' 그런데 정작 좋은 교사가 되는 방법은 무엇인지 몰랐고, 그것에 대한 갈증을 느꼈어요.\n\n교수님께서 슬라이드를 딱 3초 보여주시며 "같이 공부하는 애들이 몇 명 있는데, 관심 있는 사람은 찾아오세요"라고 하셨어요. 수업 끝나고 찾아가서 여쭤보고, 지원서 쓰고, 그렇게 들어오게 됐습니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '한마디로, 신기한 곳이에요. 모두들 아무 연고도 없이 각자 문을 두드렸는데 이렇게 한 자리에 모였다는 게 아직도 신기합니다. 그리고 그게 그냥 신기함으로 끝나지 않고, 지금은 살아 숨쉬는 공동체가 되었으니까요.' },
+      { icon: '😎', label: '꽈당 모먼트', text: '처음에 들어왔을 때 제가 먼저 진구샘을 찾아가서 이거 가르쳐달라, 저거 가르쳐 달라 해놓고 그에 대한 답장으로 교수님이 메일 주신걸 7일간 씹기도 했어요. 지금 생각해보면 참…😅하하.' },
+      { icon: '🌱', label: 'My Ambition', text: '단순히 눈앞에 도움을 주는 것을 넘어서, 더 넓은 시각으로 교실과 학교 속 현상을 바라보고 더 많은 아이들에게 도움을 줄 수 있는 사람.\n\n'우리반→옆 반→ 동학년 학급→우리 학교…' 이렇게 학생들 모두에게 퍼져나가는 영향력을 꿈꾸게 되었습니다. 현재는 그 꿈에 한발자국 다가가기 위해 임용이 아닌 대학원 진학을 계획하고 있기도 합니다.' }
+    ]
+  },
+  {
+    id: 'peer-relation-first',
+    tier: 'THE GUTS ☀️',
+    title: '어서와 또래관계는 처음이지?',
+    excerpt: '1학년 2학기 워크샵과 교수님의 수업을 듣고 또래관계의 매력을 느껴 태연이를 따라 GUTS에 들어온 박소희입니다. 저의 해맑음은 아무도 이길 수 없는 독보적인 포지션이랍니다.',
+    sections: [
+      { icon: '🤩', label: '나는 누구?', text: '저는 1학년 2학기 워크샵과 교수님의 수업을 듣고 또래관계의 매력을 느껴 태연이를 따라 GUTS에 들어온 박소희입니다. 현재는 GUTS에서 ☀️GUTS의 햇살☀️로 활동하고 있습니다. 교수님께서도 인정하신 저의 해맑음은 아무도 이길 수 없는 저의 독보적인 포지션이랍니다.' },
+      { icon: '🥹', label: '나에게 GUTS란?', text: 'GUTS는 '평범한 교사가 되고 싶지 않다'는 저의 목표이자 꿈을 실현시켜주는 곳이에요. 처음 GUTS에 들어왔을 때는 또래관계에 관해 이렇게 많은 이론이 있는지도 몰랐어요.\n\n또래관계를 대충 20년 동안 갈고 닦은 눈치로만 살필 줄 아는 저에게 GUTS는 새롭고도 올바른 시야를 열어주었답니다.' },
+      { icon: '⭐', label: '꽈당 모먼트', text: '저의 꽈당 모먼트는 여전히 이어지고 있습니다. GUTS에서 새로운 일을 접할 때마다 너무 어리숙해서 실수가 잦지만 그래도 실수 이후 많은 것을 배우고 앞으로 나아가고 있습니다.' },
+      { icon: '🌟', label: 'My Ambition', text: '저는 앞서 말했듯 평범한 교사가 되고 싶지 않습니다. 학생들의 또래관계를 파악하는 시야를 길러 한 학급을 잘 운영하고 싶고 좋지 못한 관계를 맺고 있는 학생들의 문제를 해결해 주고 싶습니다. 학생들에게 좋았고 행복했던 1년을 선물하고 싶습니다.' }
+    ]
+  },
+  {
+    id: 'guts-founder',
+    tier: 'THE GUTS Begins',
+    title: 'GUTS를 만든 사람의 이야기',
+    excerpt: '2023년에 진구 교수님의 수업을 듣고, 사례 연구가 너무 재밌어서 뒷일을 생각하지 않고 이 그룹을 만든 장본인입니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '2023년에 진구 교수님의 수업을 듣고, 사례 연구가 너무 재밌어서 뒷일을 생각하지 않고 이 그룹을 만든 장본인입니다. 지금은 그룹을 관리해주는 하나의 Mentor로서 학생들을 키우는 일에 최선을 다하고 있습니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '처음의 GUTS는 제가 스스로 발전할 수 있는 자기 계발의 장소였습니다. 처음에는 제 동기들과 공휴일까지 시간을 내어서 같이 공부하고, 이야기하는 것이 정말 뜻 깊다고 생각했습니다.\n\n지금의 GUTS는 공동체로써 의미를 더 찾은 듯 합니다. 똑똑하고 좋은 교사가 될 후배들, 조언해주고 도와주는 동기와 선배, 항상 격려를 아끼지 않는 교수님이 잘 어우러져 가며 녹아드는 공동체가 중요하다고 생각합니다.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '교수님한테 논문 쓰고 싶다고 하고 아무것도 안해가기, 네덜란드 가서 동료 교수자 앞에서 말 안하기 등 처음의 저는 되게 어렸던 기억이 납니다. 그런 순간들을 부정하지 않고 계속 발전할 수 있는 원동력으로 삼는 것 같습니다.' },
+      { icon: '🌱', label: 'My Ambition', text: '하고 싶은 일은 예비 교사 육성입니다. 더 나아가 대학교 학생들을 가르치며 좋은 교사로 거듭나는 디딤돌이 되고 싶다는 생각을 많이 했습니다.\n\n두 번째는 평범한 교사가 되는 것입니다. 매년 들어오는 학생들은 다 다르니, 학생의 입장을 고려하지 않은 채 이상적인 교사상을 설정하는 것은 어불성설이라고 느껴졌어요. 그래서 저는 평범한 교사가 되기 위해서 지금도, 앞으로도 노력하는 것 같습니다.' }
+    ]
+  },
+  {
+    id: 'born-teacher',
+    tier: 'THE GUTS',
+    title: '모태교사가 실습 갔다 온 결과',
+    excerpt: '2024년 GUTS에 합류해 현재 The GUTS 멤버로 활동 중입니다. 논문 발제부터 워크샵 기획, PATHS Workshop 초청 및 운영까지 — 어쩌다 보니 주요 멤버가 되었답니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '2024년 GUTS에 합류해 현재 The GUTS 멤버로 활동 중입니다. 논문 발제부터 워크샵 기획, PATHS Workshop 초청 및 운영까지 — 어쩌다 보니 주요 멤버가 되었답니다. 😅' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '처음엔 체계도 없고, 교수님과 함께하는 것도 낯설어서 주도적이지 못했어요. 그런데 어느 순간 논문을 읽고 발제하고, 다 같이 이야기 나누는 게 재밌어지기 시작했어요.\n\n메일 쓰는 법, 회의 하는 법, 또래관계를 보는 법, 논문 읽는 법… 한마디로, 내가 몰랐던 나를 발견한 공간이에요.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '처음엔 정말 아무것도 못 했어요. 옆에서 채연이가 먼저 논문 읽고 발제하는 걸 보면서 따라가기 바빴죠. 교수님이랑 함께하는 것도 처음엔 너무 어색하고 어렵고. 지금 생각하면 웃기지만, 그때의 저는 꽤 미숙했습니다.' },
+      { icon: '🌱', label: 'My Ambition', text: '글의 제목은 저렇지만… 저는 어렸을 때부터 초등교사를 계속해서 꿈꿔왔어요. 초등학생 때 힘든 일들이 있어서 담임선생님께 솔직하게 털어놓았지만, 별다른 반응이 없었거든요. 그래서 그때부터 '나는 도움이 필요한 아이들에게 직접적으로 도움을 줄 수 있는 좋은 어른이 되어야지' 하고 노력했답니다.\n\n아직도 사실 잘 모르겠어요. 그래도 지금 GUTS를 하면서 또래관계를 보는 시각, 교실을 읽는 방법을 조금씩 익혀가고 있고, 그게 언젠가 어려운 아이 곁에 진짜로 있어줄 수 있는 실마리가 되지 않을까 하고 있어요.' }
+    ]
+  },
+  {
+    id: 'teaching-only',
+    tier: 'THE GUTS',
+    title: "교사의 역할은 '잘하는 수업'만?",
+    excerpt: '2024년, 1학년 2학기에 교수님의 수업과 워크샵을 듣고 GUTS에 합류해 활동 중인 The GUTS의 멤버입니다. 또래관계라는 새로운 관점을 제시하던 그때의 워크샵이 저에게는 새롭게 다가왔습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: "저는 2024년, 1학년 2학기에 교수님의 수업과 워크샵을 듣고 GUTS에 합류해 활동 중인 The GUTS의 멤버입니다. 처음에는 또래관계에 대한 흥미 반, 멋있다는 느낌 반으로 들어와 배울 점 많은 동기, 선배들을 따라 지금까지 오게 되었습니다." },
+      { icon: '💛', label: '나에게 GUTS란?', text: "정말 학생들에게 필요한 교사란 무엇인지 같은 고민을 시작해 보게 된 사람들이 모인 곳이라 생각합니다. 강의를 듣는 일상을 반복하다 보면 가끔은 '잘하는 수업' 외의 학급 경영과 같은 교사 역할에 대한 인지가 흐려질 때가 많아요. 그럴 때마다 교사의 역할에 대한 넓은 시야를 가질 수 있게 해주는 곳이 GUTS인 것 같습니다." },
+      { icon: '🤸', label: '꽈당 모먼트', text: '시작부터 지금까지 끊임없이 이어지고 있는 부분이라고 생각합니다. 처음에는 또래관계에 대해 아는 것도 정말 없었고 논문을 제대로 읽는 방법, 사례연구를 하는 방법 등 모르는 게 너무 많았고, 지금도 새로운 학급을 관찰할 때면 모르는 것들이 불쑥 등장하곤 합니다.' },
+      { icon: '🌱', label: 'My Ambition', text: '학교가 아이들에게 행복한 공간이었으면 하는 마음이 가장 큰 것 같습니다. 저를 만나는 학생들도 어렸을 때의 저처럼 학교라는 공간과 선생님이라는 존재를 떠올렸을 때 좋은 기억들만 가득 떠올릴 수 있었으면 하는 마음을 가지고 교사라는 꿈을 키워가고 있습니다.' }
+    ]
+  },
+  {
+    id: 'accidental-teacher',
+    tier: 'GUTS CLUB',
+    title: '어쩌다보니 교대에 들어오게 된 교대생',
+    excerpt: '첫 동번 모임때 동번선배가 S2BC 들어오라고 하셨는데, 학부연구생이라고 생각해서 절대 안 들어갈 거라고 했었습니다. 그런데, 오픈 세미나때 "교사를 가르치는 교사"라는 멘트가 너무 마음에 들어서 들어오게 된 강동완입니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '첫 동번 모임때 동번선배가 S2BC 들어오라고 하셨는데, 학부연구생이라고 생각해서 절대 안 들어갈 거라고 했었습니다. 그런데, 교육심리 수업을 재밌게 듣고 오픈 세미나(?)때 '교사를 가르치는 교사'라는 멘트가 너무 마음에 들어서 들어오게 된 강동완입니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '교사의 꿈을 꾼지 이제 2년쯤..? 되어서 어떤 교사가 되어야 하는지, 좋은 교사는 될 수 있는지 아직도 고민이 되지만 이런 질문에 GUTS에 속해 있는 것으로 조금은 고민을 해소하는 거 같습니다.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '처음 들어와서 논문을 읽고 질문을 나누기를 했는데, 질문이 없는데 질문을 적어야해서 꽤나 힘들었습니다. 하지만 계속 읽다보니 요새는 질문이 많아진 거 같아요.' },
+      { icon: '😤', label: '아이씨 나갈까', text: '실습가서 개인정보제공 동의서 받으면서 사례연구 할 때 좀 힘들어서 나가고 싶었습니다….\n근데 하고 나니 재밌어서 나가고 싶은 마음이 사라졌습니당.' },
+      { icon: '🌱', label: 'My Ambition', text: '음….. 아직 어떤 교사가 되어주어야겠다!!라는 확실한 뜻은 크게 없지만 지금은 그래도 더 나은 교사가 되고 싶어서 노력하고 있는 거 같습니다.\n참관 실습을 나가면 해결 될 질문이라 생각했는데 그건 아니더라고요. 실습을 더 나가보면서 찾아볼 생각입니다!' }
+    ]
+  },
+  {
+    id: 'work-life-balance',
+    tier: 'THE GUTS Begins 👋',
+    title: '워라밸 때문에 교대 오신 분은 이쪽입니다.',
+    excerpt: '2024년 2학기 행복한 종강과 동시에 합류한 뒤 아무것도 모르는 상태의 3학년을 거쳐, 현재는 잠시 휴직 상태인 임고생입니다. "품절 임박"에 혹해 들어온 것 같은 기분을 버릴 수 없습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '2024년 2학기 행복한 종강과 동시에 합류한 뒤 아무것도 모르는 상태의 3학년을 거쳐, 현재는 잠시 휴직 상태인 임고생입니다. 임용이 끝나기만을 기다리고 있습니다…^^' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '지원서 마감 20분 전쯤 카톡으로 빨리 지원서를 적으라고 재촉했던 기억이 워낙 강렬해서, 저는 아직도 홈쇼핑의 단골 멘트인 '품절 임박'에 혹해 들어온 것 같은 기분을 버릴 수 없습니다.\n\n물론 그때 들어오지 않았다면 후회했을 만큼, 약 1년 6개월이라는 시간 동안 GUTS에서 좋은 경험과 추억들을 쌓아왔습니다. GUTS는 제게 흥미 있는 일을 할 때 얼마나 즐거울 수 있는지, 또 좋은 사람들과 함께할 때 얼마나 더 엄청난 일을 할 수 있는지 알려준 곳입니다.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '가장 기억에 남는 건 해외의 교육대학교 학생들이 한국에 와서 어울릴 수 있는 기회가 있었을 때, 영어를 못해서 입 몇 번 벙긋하지 않고 오뚝이 마냥 고개만 끄덕끄덕거렸던 일입니다. 그냥 영어 듣기 평가를 하루 동안 하고 온 기분이었어요. 그 일을 계기로 그 해 여름방학에 냅다 어학 연수를 떠났던 게 기억나네요.' },
+      { icon: '🌱', label: 'My Ambition', text: '사실 저는 교사가 되고 싶어서 교대에 온 케이스는 아닙니다. 원래 간호 대학을 다녔는데, 간호사가 하기 싫어서 왔어요. 그래도 앞으로의 교직 생활에서도 지금처럼 좋은 사람들과 함께 제가 관심 있는 일을 하며 즐겁게 나아가고 싶다는 바람은 있습니다.' }
+    ]
+  },
+  {
+    id: 'pioneer',
+    tier: 'THE GUTS 시조새',
+    title: '남들과 달라진 출발선',
+    excerpt: '교대는 저에게 3번째 학교였고 돌고 돌아 드디어 정착하게 되었어요. 어렸을 때부터 꿈이 교사가 아니었고 상상도 못했어요. 군대에서 특이한 경험을 통해 상황이 뒤바뀌었습니다.',
+    sections: [
+      { icon: '🕺', label: '나는 누구?', text: '안녕하세요. 현재 백산초등학교 6학년 담임을 맡고 있는 김근효입니다.\n\n교대는 저에게 3번째 학교였고 돌고 돌아 드디어 정착하게 되었어요. 어렸을 때부터 꿈이 교사가 아니었고 상상도 못했어요. '감히 내가 어떻게 아이들에게 모델링이 되어줄 수 있을까?'라고 생각했기 때문입니다.\n\n남들과 다르게 군대에서 경계작전 중 사고로 큰 부상을 입게 되었어요. 엄청 좌절하고 후회의 나날을 보내던 중, 지금의 상황을 받아들이고 어떻게 살아갈 지 고민을 하던 중 아이들에게 알려주면 좋겠다는 생각에 교대로 오게 되었습니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '처음 시작했을 때는 저 1명이었습니다. 거의 1:1과외처럼 교수님을 쫓아다니며 또래 없이 힘들었던 시절이 있었던 만큼 GUTS는 저에게는 너무 소중한 존재입니다. GUTS에서 저와 같은 생각, 같은 목표, 같은 공부를 하는 사람들을 보면서 많이 의지하고 있고 저의 지원군이자 안식처 같은 곳이에요.' },
+      { icon: '❤️‍🩹', label: '꽈당 모먼트', text: '저의 꽈당은 인생에서의 꽈당이 있고 GUTS에서의 꽈당이 있을 거 같아요. 인생에서의 꽈당은 아무 생각없이 흘려보낸 시간이 되겠네요. GUTS에서의 꽈당은 너무 많아서 일일이 말하기 어렵습니다. 본인이 꽈당하고 있다는 생각이 들면 저의 꽈당을 들으면서 위안이 되었으면 좋겠습니다!' },
+      { icon: '🌱', label: 'My Ambition', text: '저의 목표는 "나의 연구를 사회에 환원하자. 모든 아이들이 자신의 교실에서 행복하고 성인이 되어서도 유능한 사람이 될 수 있기를"\n\n처음 교대에 와서 '전문성'에 대해 세뇌교육을 받았지만 그 전문성이 어디 있는지 도통 알 수 없는 교육과정 속에서 헤매던 중 가뭄의 단비 같은 교수님을 만나게 되었고 그 전문성을 위해 끝없이 노력하고 있습니다.' }
+    ]
+  },
+  {
+    id: 'kangnam',
+    tier: 'THE GUTS Begins ♻️',
+    title: '강남을 가고 싶었는데 여기가 어디..? 나는 누구..?',
+    excerpt: 'Dobby. 나에게 GUTS란? 주인님. 꽈당 모먼트? 항상. 아이씨 나갈까? 지금도 안늦은거 같은데 go?? My Ambition: 롯데 우승.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: 'Dobby' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '주인님' },
+      { icon: '😎', label: '꽈당 모먼트', text: '항상' },
+      { icon: '🤬', label: '아이씨 나갈까', text: '지금도 안늦은거 같은데 go??' },
+      { icon: '🌱', label: 'My Ambition', text: '롯데 우승' }
+    ]
+  },
+  {
+    id: 'never-stop',
+    tier: 'THE GUTS',
+    title: 'We should never stop learning.',
+    excerpt: '안녕하세요, 저는 음악교육과 24학번 이수인입니다. 어렸을 때부터 교사가 되는 것이 꿈이었고, 더 좋은 교사가 되고 싶다는 마음을 가지고 2024년 GUTS에 합류하게 되었습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '안녕하세요, 저는 음악교육과 24학번 이수인입니다. 어렸을 때부터 교사가 되는 것이 꿈이었고, 더 좋은 교사가 되고 싶다는 마음을 가지고 2024년 GUTS에 합류하게 되었습니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '저에게 GUTS란 좋은 사람들을 만나고, 함께 어떤 교사가 되고 싶은지 고민할 수 있는 곳입니다. 다양한 사람들과 이야기를 나누며 배우는 점이 많았고, 혼자였다면 하지 못했을 고민들도 함께 나눌 수 있었습니다. 그래서 GUTS는 저에게 계속해서 배우고 성장하게 만드는 공간입니다.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '연주회 일정과 워크샵 일정이 겹쳐 함께하지 못했던 일이 있었습니다. 참여하고 싶은 마음이 컸던 만큼 더 아쉽게 느껴졌고, 일정이 겹칠 때마다 몸이 두 개였으면 좋겠다는 생각도 했습니다.' },
+      { icon: '🌱', label: 'My Ambition', text: '학생 때 또래관계로 힘들었던 시간들이 있었지만 결국 잘 이겨냈습니다. 하지만 모든 아이들이 저와 같은 방식으로 힘을 얻을 수 있는 것은 아니라는 생각이 들었고, 그래서 관계로 어려움을 겪는 아이들에게 현실적으로 도움이 될 수 있는 방법들을 고민하게 되었습니다. 서로 사랑하고 존중할 수 있도록 돕는 교사가 되고 싶습니다.' }
+    ]
+  },
+  {
+    id: 'lets-try',
+    tier: 'GUTS CLUB 🫠',
+    title: '일단 까짓 거 해보죠',
+    excerpt: '25년 12월에 정식으로 합류하게 된 과학교육과 25학번 최훈석입니다. 동번 선배의 계략, 꼬드김 혹은 가스라이팅(?)으로 인해 들어오게 되었지만 그럭저럭 만족하며 잘 적응하고 지내고 있습니다.',
+    sections: [
+      { icon: '📌', label: '나는 누구?', text: '안녕하세요 저는 25년 12월에 정식으로 합류하게 된 과학교육과 25학번 최훈석입니다. 동번 선배의 계략, 꼬드김 혹은 가스라이팅(?)으로 인해 들어오게 되었지만 그럭저럭 만족하며 잘 적응하고 지내고 있습니다. 이번에 실습을 다녀오고 사례연구를 하게 되면서 더욱 흥미를 느끼게 되었습니다.' },
+      { icon: '💛', label: '나에게 GUTS란?', text: '제가 교사생활을 하면서 지낼 둥지 같은 곳이라 생각합니다. 학생들 사이 역동에 대해 많은 관심을 가진 사람들이 모인 집단입니다. 제가 훗날 교사가 되었을 때 자문을 구할 수 있는 동료들이 있다는 거죠.' },
+      { icon: '🤸', label: '꽈당 모먼트', text: '처음 논문을 읽을 때는 구글 번역으로 번역해 읽었습니다. 번역은 어느 정도 한계가 있더군요. 전문 용어라던가 그래프같은 것들이 완벽히 번역되지 못하더군요. 그때 논문을 번역해주면서도 원문도 바로 볼 수 있게 편집해 주는 사이트를 선배에게 추천받았습니다. 지금은 그걸로 잘 읽고 있답니다.' },
+      { icon: '🌱', label: 'My Ambition', text: '저는 교사를 전혀 생각도 하지 않던 사람입니다. "까짓 거 해보자"라는 생각으로 들어왔어요. 이 안에 저를 던져놓으면 예비교사로써 뭐라도 성장할 수 있지 않을까 생각했었죠. 확실한 건 GUTS에 들어오고 난 후에 더 나은 사람이 된 거 같아요.' }
+    ]
+  }
+];
+
+let currentIdx;
+
+let currentIdx = 0;
+
+function renderGrid() {
+  const grid = document.getElementById('story-grid');
+  grid.innerHTML = STORIES.map((s, i) => `
+    <div class="story-card reveal" onclick="showDetail(${i})" style="transition-delay:${(i%4)*0.08}s">
+      <div class="card-tier">${s.tier}</div>
+      <div class="card-title">${s.title}</div>
+      <p class="card-excerpt">${s.excerpt}</p>
+      <div class="card-chips">
+        ${s.sections.map(sec => `<span class="chip">${sec.icon} ${sec.label}</span>`).join('')}
+      </div>
+      <div class="card-arrow">→</div>
+    </div>
+  `).join('');
+
+  // trigger reveals
+  requestAnimationFrame(() => {
+    const revealEls = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => obs.observe(el));
+  });
+}
+
+function showDetail(idx) {
+  currentIdx = idx;
+  const s = STORIES[idx];
+  document.getElementById('detail-breadcrumb-title').textContent = s.title.length > 30 ? s.title.slice(0,30)+'…' : s.title;
+
+  const sections = s.sections.map((sec, i) => `
+    <div class="story-section">
+      ${i > 0 ? '<div class="story-divider"></div>' : ''}
+      <span class="story-section-label">${sec.icon} ${sec.label.toUpperCase()}</span>
+      <p>${sec.text.replace(/\n/g,'<br>')}</p>
+    </div>
+  `).join('');
+
+  const navBtns = `
+    <div class="story-nav-buttons">
+      <button class="story-nav-btn" onclick="showDetail(${idx-1})" ${idx===0?'disabled':''}>← 이전 스토리</button>
+      <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gray-mid)">${idx+1} / ${STORIES.length}</span>
+      <button class="story-nav-btn" onclick="showDetail(${idx+1})" ${idx===STORIES.length-1?'disabled':''}>다음 스토리 →</button>
+    </div>
+  `;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-tier">${s.tier}</div>
+    <h2 class="detail-title">${s.title}</h2>
+    ${sections}
+    ${navBtns}
+  `;
+
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showList() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('list-view').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderGrid();
+</script>
+</body>
+</html>
