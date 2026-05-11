@@ -1292,11 +1292,37 @@ const tlObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 tlItems.forEach(el => tlObserver.observe(el));
 
-// Tab switching
+// Tab switching with auto-cycle
+var tabTimer = null;
+var currentTab = 0;
+var tabCount = 4;
+
 function switchTab(idx) {
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
-  document.querySelectorAll('.tab-content').forEach((c,i) => c.classList.toggle('active', i===idx));
+  currentTab = idx;
+  document.querySelectorAll('.tab-btn').forEach(function(b, i) { b.classList.toggle('active', i === idx); });
+  document.querySelectorAll('.tab-content').forEach(function(c, i) { c.classList.toggle('active', i === idx); });
 }
+
+function startTabCycle() {
+  tabTimer = setInterval(function() {
+    currentTab = (currentTab + 1) % tabCount;
+    switchTab(currentTab);
+  }, 5000);
+}
+
+function resetTabCycle(idx) {
+  clearInterval(tabTimer);
+  switchTab(idx);
+  startTabCycle();
+}
+
+// Override tab button clicks to reset timer
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.tab-btn').forEach(function(btn, i) {
+    btn.setAttribute('onclick', 'resetTabCycle(' + i + ')');
+  });
+  startTabCycle();
+});
 
 // Membership step
 function selectMem(idx) {
